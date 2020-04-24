@@ -1,0 +1,22 @@
+{
+  "name": "simple-webrtc-video-chat-using-firestore",
+  "version": "1.0.0",
+  "description": "This code is forked off the repo at",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SumitBando/simple-webrtc-video-chat-using-firestore.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SumitBando/simple-webrtc-video-chat-using-firestore/issues"
+  },
+  "homepage": "https://github.com/SumitBando/simple-webrtc-video-chat-using-firestore#readme",
+  "devDependencies": {
+    "firebase": "^7.14.2"
+  }
+}
