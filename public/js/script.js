@@ -1,5 +1,24 @@
-var database = firebase.database().ref();
-var myId = Math.floor(Math.random() * 1000000000);
+async function init() {
+  const localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+  showMyFace(localStream);
+  const peerConn = createPeerConnection();
+  localStream.getTracks().forEach(track => {
+    console.log('adding my track to peer connection: ', track)
+    peerConn.addTrack(track, localStream);
+  });
+  peerConn.onicecandidate = deliverICEmessage;
+  peerConn.ontrack = getRemoteTrack;
+  getSignals();
+}
+
+/**
+ * @param {MediaStream} localStream
+ */
+function showMyFace(localStream) {
+  console.log('1/2: Display local MediaStream video');
+  /** @type{HTMLVideoElement} */ const myVideo = document.getElementById("myVideo");
+  myVideo.srcObject = localStream
+}
 
 /** @type{RTCPeerConnection} */
 var peerConn = null;
@@ -40,10 +59,14 @@ function createPeerConnection() {
         username: "sumit@hotmail.com",
       }],
     // iceCandidatePoolSize: 10,
-  };  
+  };
+  console.log('3/4: Create PeerConnection')
   peerConn = new RTCPeerConnection(configuration);
   registerPeerConnectionListeners(peerConn);
+  return peerConn;
 }
+
+const myId = Math.floor(Math.random() * 1000000000);
 
 /**
  * @param {RTCPeerConnectionIceEvent} event
@@ -63,7 +86,7 @@ function deliverICEmessage(event) {
  * @param {RTCSessionDescriptionInit} sdp
  */
 async function handleOffer(sdp) {
-  console.log('8. Add that Offer to the PeerConnection on your friend’s computer')
+  console.log('8. Add that Offer to the remote side of PeerConnection')
   await peerConn.setRemoteDescription(new RTCSessionDescription(sdp))
 
   // 12. Create an Answer on your friend’s computer
@@ -74,53 +97,27 @@ async function handleOffer(sdp) {
   sendMessage(myId, JSON.stringify({ 'sdp': peerConn.localDescription }));
 }
 
-function readMessage(data) {
-  var msg = JSON.parse(data.val().message);
-  var sender = data.val().sender;
-  if (sender == myId) {
-    // console.log("rejecting my own message")
+function handleSignal(data) {
+  const sender = data.val().sender;
+  if (!sender || (sender == myId)) {
+    // console.log("rejecting my own, or senderless message")
     return
   }
-
+  const messageString = data.val().message;
+  if (!messageString) {
+    console.log("message missing body")
+    return
+  }
+  const msg = JSON.parse(messageString);
   if (msg.ice != undefined) {
-    // console.log('Add peer ICE Candidate to candidate pool: ', msg.ice)
+    // console.log('18: Add peer ICE Candidate to candidate pool: ', msg.ice)
     peerConn.addIceCandidate(new RTCIceCandidate(msg.ice));
   } else if (msg.sdp.type == "offer") {
     handleOffer(msg.sdp)
   } else if (msg.sdp.type == "answer") {
-    console.log('15. Add that Answer to the PeerConnection on your computer')
+    console.log('15. Add that Answer to the remote side of PeerConnection')
     peerConn.setRemoteDescription(new RTCSessionDescription(msg.sdp));
   }
-};
-
-function getMessages() {
-  database.on('child_added', readMessage);
-}
-
-function sendMessage(senderId, data) {
-  const msg = database.push({ sender: senderId, message: data });
-  msg.remove();
-}
-
-async function showMyFace() {
-  console.log('1/2: Display local MediaStream video');
-  const myVideo = document.getElementById("myVideo");
-  const localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true })
-  myVideo.srcObject = localStream
-
-  console.log('3/4: Create PeerConnection')
-  createPeerConnection();
-
-  localStream.getTracks().forEach(track => {
-    console.log('adding my track to peer connection: ', track)
-    peerConn.addTrack(track, localStream);
-  });
-
-  // peerConn.addEventListener('track', getRemoteTrack);
-  peerConn.ontrack = getRemoteTrack;
-
-  peerConn.onicecandidate = deliverICEmessage;
-  getMessages();
 }
 
 /**
@@ -128,22 +125,71 @@ async function showMyFace() {
  */
 function getRemoteTrack(event) {
   console.log('Got remote stream:', event.streams[0]);
-  var friendsVideo = document.getElementById("friendsVideo");
-  friendsVideo.srcObject = event.streams[0];
-
-  // const remoteStream = new MediaStream();
-  // friendsVideo.srcObject = remoteStream;
-  // event.streams[0].getTracks().forEach(track => {
-  //   console.log('Adding track to remoteStream:', track);
-  //   remoteStream.addTrack(track);
-  // })
+  const peerVideo = document.getElementById("peerVideo");
+  peerVideo.srcObject = event.streams[0];
 }
 
 async function callPeer() {
   console.log('5: Create an Offer on this device');
-  let offer = await peerConn.createOffer();
-  console.log('6: Add that Offer to the PeerConnection on your computer')
+  /** @type{RTCSessionDescriptionInit} */ let offer = await peerConn.createOffer();
+  console.log('6: Add that Offer to the PeerConnection on your computer: ', offer)
   await peerConn.setLocalDescription(offer)
-  console.log('7: Send  Offer to peer')
+  console.log('7: Send  Offer to peer through signaling server:', peerConn.localDescription)
   sendMessage(myId, JSON.stringify({ 'sdp': peerConn.localDescription }));
+}
+
+/*
+ * Signaling functionality is not part of WebRTC, but is required
+ * Here implemented using Firebase Realtime Database change notifications
+*/
+const database = firebase.database().ref();
+function getSignals() {
+  database.on('child_added', handleSignal);
+}
+/**
+ * @param {number} senderId
+ * @param {string} data
+ */
+function sendMessage(senderId, data) {
+  const msg = database.push({ sender: senderId, message: data });
+  msg.remove();
+}
+function w(query) {
+  return database.push(JSON.stringify(query))
+}
+
+function r(query) {
+  return database.push(JSON.stringify(query))
+}
+
+function dropcall(){}
+
+function debug(){debugger;}
+
+function query(query){
+  // read input
+  eval('database.' + query)
+}
+
+function q() {
+  database.once("value", function(snapshot) {
+    console.log(snapshot.val())
+    // debugger
+  })
+}
+
+function showAll(){
+firebase.database().ref('/').once('value', function(snapshot) {
+  snapshot.forEach(function(childSnapshot) {
+    var childKey = childSnapshot.key;
+    var childData = childSnapshot.val();
+    console.log(childKey, ' : ', childData);
+})})
+}
+
+// .remove()
+// .set()
+
+function count() {
+//firebase.database().ref('data/'+id).update({name:"new_name"});
 }

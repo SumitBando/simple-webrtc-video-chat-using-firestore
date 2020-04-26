@@ -8,4 +8,16 @@ video {
 button {
   margin: 5px 0px 0px 10px !important;
   width: 654px;
+  height: 46px;
+
+  color: #fff;
+  background-color: #286090;
+  border-color: #122b40;
+  text-decoration: none;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.3333333;
+  border-radius: 6px;  
 }

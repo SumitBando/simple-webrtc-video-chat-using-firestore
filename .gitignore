@@ -63,3 +63,10 @@ node_modules/
 
 # dotenv environment variables file
 .env
+public/css/bootstrap.min.css
+public/fonts/glyphicons-halflings-regular.ttf
+public/fonts/glyphicons-halflings-regular.woff2
+public/script copy.js
+bootstrap.min.css
+fonts/glyphicons-halflings-regular.ttf
+fonts/glyphicons-halflings-regular.woff2

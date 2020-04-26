@@ -1,3 +1,60 @@
+
+https://strongloop.com/strongblog/type-hinting-in-javascript/
+
+https://medium.com/@muravitskiy.mail/cannot-redeclare-block-scoped-variable-varname-how-to-fix-b1c3d9cc8206
+
+npm install firebase --save-dev
+Automatic type aquisition requies
+https://code.visualstudio.com/docs/nodejs/working-with-javascript
+
+Intialized for firebase firestore + hosting
+firebase init
+
+Tips:
+firebase serve --only hosting --host 0.0.0.0
+
+# Purpose of the fork
+* Removed use of decpreated API .addStream() and use track() instead
+* Use my personal Turn server credentials
+* Use Firebase hosting
+* Use Firebase automated inclusion of framework depending on environment
+* Moved deployable files to /public directory, for Firebase hosting
+
+
+Then changed the code to make it easier for me to understand, with:
+* Use async / await instead of promise chain syntax
+* Use of type hints in VSCode
+* Use npm install of Firebase to take advantage of automatic type aquisition in VSCode
+* Removed referring to Bootstrap CSS on CD, to reduce prevent CDN from cookieing you incorrectly, resulting in browser warning
+* Removed use of bootstrap CSS and icons entirely to just make one button pretty, to reduce cognitive noise
+* Added favicon to stop Chrome devtools from complaining
+
+Live depolyment is at
+```code
+https://simple-webrtc-e9269.web.app/
+```
+
+To make private repo, followed instructions at:
+``` code
+https://help.github.com/en/github/creating-cloning-and-archiving-repositories/duplicating-a-repository
+```
+
+Changed origin with:
+``` bash
+$ git remote rm origin
+$ git remote add origin https://github.com/SumitBando/simple-webrtc-video-chat-using-firebase.git
+$ git config master.remote origin
+$ git config master.merge refs/heads/master
+$ git push --set-upstream origin master
+```
+
+Original code was from:
+``` code
+https://github.com/WebsiteBeaver/simple-webrtc-video-chat-using-firebase
+```
+## Original README below
+
+
 # Simple WebRTC Video Chat Using Firebase
 
 ![Simple WebRTC Video Chat Using Firebase](https://user-images.githubusercontent.com/26162804/31845534-ac2cca0c-b5cf-11e7-8874-94c4d978fcb8.jpg)

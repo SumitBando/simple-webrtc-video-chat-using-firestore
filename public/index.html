@@ -1,18 +1,39 @@
 <html>
   <head>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <!-- <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"> -->
     <link rel="stylesheet" type="text/css" href="css/style.css">
   </head>
-  <body onload="showMyFace()">
+  <body onload="init()">
+    <div>
     <video id="myVideo" autoplay muted playsinline></video>
-    <video id="friendsVideo" autoplay playsinline></video>
+    <video id="peerVideo" autoplay playsinline></video>
+  </div>
     <br />
-    <button onclick="callPeer()" type="button" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-facetime-video" aria-hidden="true"></span>Call Peer</button>
-    <!-- <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js"></script> -->
+    <button onclick="callPeer()" type="button">
+      Call
+    </button>
+    <br />
+    <button onclick="dropcall()" type="button">
+      Drop Call
+    </button>
+    <br />
+    <button onclick="debug()" type="button">
+      Debug
+    </button>
+    <br />
+    <label for="query">
+      <input type="text" id=query>
+    </label>
+    <br />
+    <button onclick="query()" type="button">
+      Query
+    </button>
+
     <script src="/__/firebase/7.14.1/firebase-app.js"></script>
     <script src="/__/firebase/7.14.1/firebase-database.js"></script>
     <script src="/__/firebase/init.js"></script>
+
     <script src="js/script.js"></script>
+    <!-- <script src="queries.js"></script> -->
   </body>
 </html>
+
