@@ -140,9 +140,16 @@ async function callPeer() {
 
 /*
  * Signaling functionality is not part of WebRTC, but is required
- * Here implemented using Firebase Realtime Database change notifications
+ * Here implemented using Firestore database asynchronous change notifications
 */
-const database = firebase.database().ref();
+
+// const firebase = require("firebase");
+// Required for side-effects
+// require("firebase/firestore");
+const db = firebase.firestore();
+// var ref = db.collection('signals').
+// collection("users").ref();
+
 function getSignals() {
   database.on('child_added', handleSignal);
 }
